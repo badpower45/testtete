@@ -4,7 +4,7 @@ name: Deploy static content to Pages
 on:
   # Runs on pushes targeting the default branch
   push:
-    branches: ["main"] # <--- اتأكد إن ده اسم الBrian الرئيسي (main)
+    branches: ["main"]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -15,14 +15,11 @@ permissions:
   pages: write
   id-token: write
 
-# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
-# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
 concurrency:
   group: "pages"
   cancel-in-progress: false
 
 jobs:
-  # Single deploy job since we're just deploying
   deploy:
     environment:
       name: github-pages
@@ -32,18 +29,22 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         
-      # -----------------------------------------------
-      # 🚀 الخطوات دي هي اللي إحنا ضفناها 🚀
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20 # <--- بنستخدم إصدار نود 20
+          node-version: 20
+          
       - name: Install dependencies
-        run: npm install # <--- بيعمل تثبيت للمكتبات
+        run: npm install
+        
+      # 🚀🚀 الخطوة الجديدة اللي ضفناها عشان تصلح المشكلة 🚀🚀
+      - name: Grant execute permission for Vite
+        run: chmod +x node_modules/.bin/vite
+      # 🚀🚀-------------------------------------------🚀🚀
+        
       - name: Build
-        run: npm run build # <--- بيعمل بيلد للمشروع
-      # -----------------------------------------------
-
+        run: npm run build
+        
       - name: Setup Pages
         uses: actions/configure-pages@v5
         
@@ -51,7 +52,7 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           # Upload build directory
-          path: './build' # <--- 🚀 دي أهم خطوة عشان يلاقي مجلد build
+          path: './build'
           
       - name: Deploy to GitHub Pages
         id: deployment
